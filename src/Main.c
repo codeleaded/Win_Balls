@@ -19,7 +19,7 @@ Ball Ball_New(Vec2 p,Vec2 v,F32 r,F32 m){
     b.m = m;
     return b;
 }
-void Ball_Update(Ball* b,Rect border,float w->ElapsedTime){
+void Ball_Update(Ball* b,Rect border,float ElapsedTime){
     //if(b->p.x < -b->r)          b->p.x = 1.0f + b->r;
     //if(b->p.x > 1.0f + b->r)    b->p.x = 0.0f - b->r;
     //if(b->p.y < -b->r)          b->p.y = 1.0f + b->r;
@@ -42,10 +42,10 @@ void Ball_Update(Ball* b,Rect border,float w->ElapsedTime){
         b->v.y *= -1.0f;
     }
 
-    b->v = Vec2_Add(b->v,Vec2_Mulf(Vec2_Neg(b->v),0.1f * w->ElapsedTime));
+    b->v = Vec2_Add(b->v,Vec2_Mulf(Vec2_Neg(b->v),0.1f * ElapsedTime));
     if(Vec2_Mag(b->v) < 0.0001f) b->v = (Vec2){ 0.0f,0.0f };
     
-    b->p = Vec2_Add(b->p,Vec2_Mulf(b->v,w->ElapsedTime));
+    b->p = Vec2_Add(b->p,Vec2_Mulf(b->v,ElapsedTime));
 }
 char Ball_Point(Ball* b,Vec2 p){
     float d = Vec2_Mag(Vec2_Sub(p,b->p));
@@ -98,8 +98,8 @@ TransformedView tv;
 void Setup(AlxWindow* w){
     RGA_Set(Time_Nano());
 
-    tv = TransformedView_New((Vec2){ GetHeight(),GetHeight() });
-    Border = Rect_New((Vec2){ 0.0f,0.0f },(Vec2){ 5.0f,5.0f }); 
+    tv = TransformedView_Make((Vec2){ GetWidth(),GetHeight() },(Vec2){ 0.0f,0.0f },(Vec2){ 1.0f,1.0f },(float)GetWidth() / (float)GetHeight());
+    Border = Rect_New((Vec2){ 0.0f,0.0f },(Vec2){ 5.0f,5.0f });
     Balls = Vector_New(sizeof(Ball));
     
     for(int i = 0;i<10;i++){
@@ -113,8 +113,8 @@ void Setup(AlxWindow* w){
     }
 }
 void Update(AlxWindow* w){
+    TransformedView_Output(&tv,(Vec2){ GetWidth(),GetHeight() });
     TransformedView_HandlePanZoom(&tv,window.Strokes,GetMouse());
-
     Vec2 Mouse = TransformedView_ScreenWorldPos(&tv,GetMouse());
 
     if(Stroke(ALX_MOUSE_L).PRESSED){
@@ -175,7 +175,7 @@ void Delete(AlxWindow* w){
 }
 
 int main(){
-    if(Create("Balls",1300,1300,1,1,Setup,Update,Delete))
+    if(Create("Balls",1920,1080,1,1,Setup,Update,Delete))
         Start();
     return 0;
 }
